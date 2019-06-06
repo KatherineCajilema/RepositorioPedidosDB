@@ -12,16 +12,16 @@ Alter table movimiento.CabezeraP drop Constraint [Solicita];
 go
 -- Alter tabla Cliente
 
-ALTER TABLE [catalogo.Cliente]
+ALTER TABLE catalogo.Cliente
 ALTER COLUMN [codcli] varchar(6) NOT NULL
 GO
-ALTER TABLE [movimiento.CabezeraP]
+ALTER TABLE movimiento.CabezeraP
 ALTER COLUMN [codcli] varchar(6) NOT NULL
 GO
-ALTER TABLE [movimiento.DetalleP]
-ALTER COLUMN [codped] varchar(10) NOT NULL
+ALTER TABLE movimiento.DetalleP
+ALTER COLUMN codped varchar(10) NOT NULL
 GO
-ALTER TABLE [movimiento.CabezeraP]
+ALTER TABLE movimiento.CabezeraP
 ALTER COLUMN [codped] varchar(10) NOT NULL
 GO
 
