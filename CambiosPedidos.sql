@@ -19,7 +19,7 @@ go
 Alter table movimiento.CabezeraP drop Constraint [pk_CabezeraP];
 go
 
--- Alter tabla Cliente
+-- Alter tablas Cliente, DetalleP, CabezeraP
 
 ALTER TABLE catalogo.Cliente
 ALTER COLUMN [codcli] varchar(6) NOT NULL
@@ -35,17 +35,18 @@ ALTER COLUMN [codped] varchar(10) NOT NULL
 GO
 
 -- Procedimiento Almacenado para la actualizacion de codcli de la tabla Cliente
+CREATE TABLE #rowidcliente (numrow int, codcli int)
+go
 CREATE PROCEDURE pa_uCamposCliente AS
 declare @contador int, @totalrow int 
 set @contador = 1
 set @totalrow = (select COUNT(*) from catalogo.Cliente)
-CREATE TABLE #rowidcli (numrow int, codcli int)
 select ROW_NUMBER() OVER (ORDER BY codcli) AS numrow, CAST(SUBSTRING(codcli,2,2) AS INT) 
-as codcli into #rowidcli from catalogo.Cliente
+as codcli into #rowidcliente from catalogo.Cliente
 while @contador < @totalrow
 BEGIN
 declare @numcliente int 
-set @numcliente = (select codcli from #rowidcli WHERE numrow = @contador)
+set @numcliente = (select codcli from #rowidcliente WHERE numrow = @contador)
 if (@numcliente < 10)
 begin
 UPDATE catalogo.Cliente
@@ -60,6 +61,11 @@ WHERE codcli = 'C' + @numcliente
 end
 set @contador = @contador + 1;
 END
+GO
+---Prueba SP
+exec pa_uCamposCliente
+go
+select * from catalogo.Cliente
 GO
 --Procedimiento Almacenado para la actualizacion de las clave primaria codPed y codcli de la tabla CabezeraP
 CREATE PROCEDURE pa_uCamposCabezeraP AS
@@ -78,8 +84,8 @@ set @numcliente = (select codcli from #rowidped WHERE numrow = @contador)
 if (@numpedido < 10)
 begin
 UPDATE movimiento.CabezeraP
-set codped = 'PE0000000' +  @numpedido
-where codped = 'R0' + @numpedido
+set codped = 'PE0000000' +  CAST(@numpedido AS varchar)
+where codped = 'R0' + CAST (@numpedido AS varchar)
 end
 else
 begin
