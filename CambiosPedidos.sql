@@ -22,13 +22,17 @@ GO
 
 -- Procedimiento Almacenado para la actualizacion de claves primarias
 CREATE PROCEDURE pa_uCamposCliente AS
-SELECT  codcli 
-FROM catalogo.Cliente
-UPDATE catalogo.Cliente
-SET codcli = 
-RETURN
-GO
-SELECT  codcli 
+declare @contador int, @totalrow int 
+set @contador = 0
+set @totalrow = (select COUNT(*) from catalogo.Cliente)
+while @contador < @totalrow
+begin
+declare @numrow int
+set @numrow = (select CAST(SUBSTRING(codcli,2,2) AS INT) from catalogo.Cliente)
+end
+
+SELECT  ROW_NUMBER() OVER (ORDER BY codcli) AS Q,codcli 
 FROM catalogo.Cliente
 
 select * from catalogo.Cliente
+select CAST(SUBSTRING(codcli,2,2) AS INT) from catalogo.Cliente 
