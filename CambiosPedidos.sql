@@ -10,6 +10,15 @@ Alter table movimiento.DetalleP drop Constraint [tienedetalle];
 go
 Alter table movimiento.CabezeraP drop Constraint [Solicita];
 go
+Alter table catalogo.Cliente drop Constraint [debetener]; 
+go
+Alter table catalogo.Cliente drop Constraint [pk_Cliente];
+go
+Alter table movimiento.DetalleP drop Constraint [pk_DetalleP];
+go
+Alter table movimiento.CabezeraP drop Constraint [pk_CabezeraP];
+go
+
 -- Alter tabla Cliente
 
 ALTER TABLE catalogo.Cliente
