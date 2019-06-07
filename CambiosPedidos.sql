@@ -6,18 +6,20 @@ go
 -- Se prevee la actualizacion de registros de la tabla DetalleP que hace referencia 
 -- la clave primaria codped 
 -- Se eliminan los constrains de clave referencial de la base de datos Pedidos para las tablas Cliente, CabezeraP y DetalleP
-Alter table movimiento.DetalleP drop Constraint [tienedetalle];
-go
-Alter table movimiento.CabezeraP drop Constraint [Solicita];
-go
-Alter table catalogo.Cliente drop Constraint [debetener]; 
-go
 Alter table catalogo.Cliente drop Constraint [pk_Cliente];
 go
 Alter table movimiento.DetalleP drop Constraint [pk_DetalleP];
 go
 Alter table movimiento.CabezeraP drop Constraint [pk_CabezeraP];
 go
+
+Alter table movimiento.DetalleP drop Constraint [tienedetalle];
+go
+Alter table movimiento.CabezeraP drop Constraint [Solicita];
+go
+Alter table catalogo.Cliente drop Constraint [debetener]; 
+go
+
 
 -- Alter tablas Cliente, DetalleP, CabezeraP
 
@@ -173,7 +175,13 @@ go
 Alter table movimiento.CabezeraP add Constraint [pk_CabezeraP] primary key ([codped]);
 
 --Modificacion campo garante de la tabla cliente
--- Procedimiento Almacenado para la actualizacion de codcli de la tabla Cliente
+Alter table catalogo.Cliente drop Constraint [Ubicado]; 
+go
+
+ALTER TABLE catalogo.Cliente
+ALTER COLUMN [garante] varchar(6) NOT NULL
+GO
+-- Procedimiento Almacenado para la actualizacion de garante y codcli de la tabla Cliente
 CREATE TABLE #rowidclientes (numrow int, codcli int, garante int)
 go
 CREATE PROCEDURE pa_uCamposClientes AS
