@@ -111,6 +111,11 @@ end
 set @contador = @contador + 1;
 END
 GO
+
+--- Prueba
+exec pa_uCamposCabezeraP
+select * from movimiento.CabezeraP
+
 --Procedimiento Almacenado para la actualizacion de las clave primaria codPed de la tabla DetalleP
 CREATE TABLE #rowidet (numrow int, codped int)
 GO
@@ -140,10 +145,80 @@ end
 set @contador = @contador + 1;
 END
 
---Pruebas
+--Prueba
+exec pa_uCamposDetalleP
+select * from movimiento.DetalleP
+---Varios
+
 select ROW_NUMBER() OVER (ORDER BY codcli) AS numrow, CAST(SUBSTRING(codcli,2,2) AS INT) 
 as codcli from movimiento.CabezeraP
 select * from movimiento.CabezeraP
 select ROW_NUMBER() OVER (ORDER BY codped, codcli) AS numrow,
 CAST(SUBSTRING(codped,2,2) AS INT) as codped, 
 CAST(SUBSTRING(codcli,2,2) AS INT) as codcli  from movimiento.CabezeraP
+
+--Se procede a crear las claves primarias y foraneas nuevamente.
+
+Alter table movimiento.CabezeraP add Constraint [Solicita] foreign key([codcli]) references catalogo.Cliente ([codcli])  on update no action on delete no action 
+go
+Alter table catalogo.Cliente add Constraint [debetener] foreign key([garante]) references catalogo.Cliente ([codcli])  on update no action on delete no action 
+go
+Alter table movimiento.DetalleP add Constraint [tienedetalle] foreign key([codped]) references movimiento.CabezeraP ([codped])  on update no action on delete no action 
+go
+
+Alter table catalogo.Cliente add Constraint [pk_Cliente] primary key ([codcli]);
+go
+Alter table movimiento.DetalleP add Constraint [pk_DetalleP] primary key ([numlinea],[codped]);
+go
+Alter table movimiento.CabezeraP add Constraint [pk_CabezeraP] primary key ([codped]);
+
+--Modificacion campo garante de la tabla cliente
+-- Procedimiento Almacenado para la actualizacion de codcli de la tabla Cliente
+CREATE TABLE #rowidclientes (numrow int, codcli int, garante int)
+go
+CREATE PROCEDURE pa_uCamposClientes AS
+declare @contador int, @totalrow int 
+set @contador = 1
+set @totalrow = (select COUNT(*) from catalogo.Cliente)
+select ROW_NUMBER() OVER (ORDER BY codcli) AS numrow, CAST(SUBSTRING(codcli,2,2) AS INT) 
+as codcli, CAST(SUBSTRING(garante,2,2) AS INT) as garante into #rowidclientes from catalogo.Cliente
+while @contador <= @totalrow
+BEGIN
+declare @numcliente int, @numgarante int
+set @numgarante = (select garante from #rowidclientes WHERE numrow = @contador)
+set @numcliente = (select codcli from #rowidclientes WHERE numrow = @contador)
+if (@numcliente < 10)
+begin
+UPDATE catalogo.Cliente
+set codcli = 'C0000' +  CAST(@numcliente AS varchar)
+where codcli = 'C0' + CAST(@numcliente AS varchar)
+end
+else
+begin
+UPDATE catalogo.Cliente
+set codcli = 'C000' +  CAST(@numcliente AS varchar)
+WHERE codcli = 'C' + CAST(@numcliente AS varchar)
+end
+
+if (@numgarante < 10)
+begin
+UPDATE catalogo.Cliente
+set garante = 'C0000' +  CAST(@numgarante AS varchar)
+where garante = 'C0' + CAST(@numgarante AS varchar)
+end
+else
+begin
+UPDATE catalogo.Cliente
+set garante = 'C000' +  CAST(@numgarante AS varchar)
+WHERE garante = 'C' + CAST(@numgarante AS varchar)
+end
+
+set @contador = @contador + 1;
+END
+GO
+---Prueba SP
+exec pa_uCamposClientes
+go
+select * from catalogo.Cliente
+GO
+
